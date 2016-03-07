@@ -7,7 +7,7 @@ Tested: JBDS 8, Local Test with Fuse 6.2.1
 This example is based on an [example](http://wei-meilin.blogspot.com/2015/07/jboss-fuse-updated-camel-101-labs.html) created by Christina Lin, thanks!  
 
 Using the REST DSL functionality
-* Input XML it will convert to JSON
+* Input XML it will convert to JSON  
 URL: `http://<IP/HOSTNAME>:9091/app/newStockEntryXML`  
 ```
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
@@ -19,7 +19,7 @@ URL: `http://<IP/HOSTNAME>:9091/app/newStockEntryXML`
 <shares>11</shares>
  </stocktrading>
 ```
-* Input JSON it will convert to XML
+* Input JSON it will convert to XML  
 URL: `http://<IP/HOSTNAME>:9091/app/newStockEntryJSON`  
 ```
 {"stocktrade":{"name":"Test User","custId":"12345","vip":1,"stockId":"XYZ","shares":11}}
