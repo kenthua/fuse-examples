@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<mappings xmlns="http://dozer.sourceforge.net" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://dozer.sourceforge.net http://dozer.sourceforge.net/schema/beanmapping.xsd">
+    <configuration>
+        <wildcard>false</wildcard>
+    </configuration>
+    <mapping>
+        <class-a>generated.Stocktrading</class-a>
+        <class-b>source.Source</class-b>
+        <field>
+            <a>custId</a>
+            <b>stocktrade.custId</b>
+        </field>
+        <field>
+            <a>name</a>
+            <b>stocktrade.name</b>
+        </field>
+        <field>
+            <a>shares</a>
+            <b>stocktrade.shares</b>
+        </field>
+        <field>
+            <a>stockId</a>
+            <b>stocktrade.stockId</b>
+        </field>
+        <field>
+            <a>vip</a>
+            <b>stocktrade.vip</b>
+        </field>
+    </mapping>
+</mappings>
