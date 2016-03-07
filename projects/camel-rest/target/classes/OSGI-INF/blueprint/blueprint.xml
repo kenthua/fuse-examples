@@ -5,53 +5,83 @@
        http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
        http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
 
-	<camelContext xmlns="http://camel.apache.org/schema/blueprint">
-  <endpoint uri="dozer:stockTradeJSONToXML?sourceModel=source.Source&amp;targetModel=generated.Stocktrading&amp;marshalId=generated&amp;unmarshalId=sourceSource&amp;mappingFile=stockTradeJSONToXML.xml" id="stockTradeJSONToXML"/>
-  <endpoint uri="dozer:stockTradeXMLToJSON?sourceModel=generated.Stocktrading&amp;targetModel=source.Source&amp;marshalId=transform-json&amp;unmarshalId=generated&amp;mappingFile=stockTradeXMLToJSON.xml" id="stockTradeXMLToJSON"/>
-  <dataFormats>
-    <json library="Jackson" unmarshalTypeName="source.Source" id="sourceSource"/>
-    <jaxb contextPath="generated" id="generated"/>
-    <json library="Jackson" id="transform-json"/>
-  </dataFormats>
-  <restConfiguration component="jetty" port="9091"/>
-  <rest path="/say">
-    <get uri="/hello">
-      <to uri="direct:hello"/>
-    </get>
-    <get uri="/bye">
-      <to uri="direct:bye"/>
-    </get>
-  </rest>
-  <rest path="/app">
-    <get uri="/byId/{id}">
-      <to uri="direct:byId"/>
-    </get>
-    <post uri="/newStockEntry">
-      <to uri="direct:newStockEntry"/>
-    </post>
-  </rest>
-  <route>
-    <from uri="direct:hello"/>
-    <transform>
-      <constant>Hello World</constant>
-    </transform>
-  </route>
-  <route>
-    <from uri="direct:bye"/>
-    <transform>
-      <constant>Bye World</constant>
-    </transform>
-  </route>
-  <route>
-    <from uri="direct:byId"/>
-    <log message="${body}"/>
-  </route>
-  <route>
-    <from uri="direct:newStockEntry"/>
-    <log message="pre transform: ${body}"/>
-    <to ref="stockTradeJSONToXML"/>
-    <log message="post transform: ${body}"/>
-  </route>
-</camelContext>
+	<camelContext id="context-4f81fa65-c073-4839-8021-d9f5d151e3e2"
+		xmlns="http://camel.apache.org/schema/blueprint">
+		<endpoint
+			uri="dozer:stockTradeJSONToXML?sourceModel=source.Source&amp;targetModel=generated.Stocktrading&amp;marshalId=generated&amp;unmarshalId=sourceSource&amp;mappingFile=stockTradeJSONToXML.xml"
+			id="stockTradeJSONToXML" />
+		<endpoint
+			uri="dozer:stockTradeXMLToJSON?sourceModel=generated.Stocktrading&amp;targetModel=source.Source&amp;marshalId=transform-json&amp;unmarshalId=generated&amp;mappingFile=stockTradeXMLToJSON.xml"
+			id="stockTradeXMLToJSON" />
+		<dataFormats>
+			<json library="Jackson" unmarshalTypeName="source.Source" id="sourceSource" />
+			<jaxb contextPath="generated" id="generated" />
+			<json library="Jackson" id="transform-json" />
+		</dataFormats>
+		<restConfiguration component="jetty" port="9091" />
+		<rest path="/say">
+			<get uri="/hello">
+				<to uri="direct:hello" />
+			</get>
+			<get uri="/bye">
+				<to uri="direct:bye" />
+			</get>
+		</rest>
+		<rest path="/app">
+			<get uri="/byId/{id}">
+				<to uri="direct:byId" />
+			</get>
+			<post uri="/newStockEntryXML" consumes="application/xml">
+				<to uri="direct:newStockEntryXML" />
+			</post>
+			<post uri="/newStockEntryJSON" consumes="application/json">
+				<to uri="direct:newStockEntryJSON" />
+			</post>
+		</rest>
+		<route>
+			<from uri="direct:hello" />
+			<transform>
+				<constant>Hello World</constant>
+			</transform>
+		</route>
+		<route>
+			<from uri="direct:bye" />
+			<transform>
+				<constant>Bye World</constant>
+			</transform>
+		</route>
+		<route>
+			<from uri="direct:byId" />
+			<log message="${body}" />
+		</route>
+		<!-- REST DSL when using restConfiguration binding attribute, will convert 
+			input into POJO -->
+		<!-- REST DSL, when not using restConfiguration binding attribute (default 
+			is "off") need to set streamCache to true, otherwise the message body is 
+			removed after the pre transform: ${body} log -->
+		<!-- however, using from file input, the streamcache doesn't need to be set 
+			to true -->
+		<route streamCache="true">
+			<from uri="direct:newStockEntryXML" />
+			<log message="pre transform XML: ${body}" />
+			<to ref="stockTradeXMLToJSON" />
+			<log message="post transform JSON: ${body}" />
+			<setHeader headerName="CamelFileName">
+				<simple>${date:now:yyyyMMddhhmmssSSS}-converted.json</simple>
+			</setHeader>
+			<to uri="file:done" />
+		</route>
+		<route streamCache="true">
+			<from uri="direct:newStockEntryJSON" />
+			<log message="pre transform JSON: ${body}" />
+			<to ref="stockTradeJSONToXML" />
+			<log message="post transform XML: ${body}" />
+			<setHeader headerName="CamelFileName">
+				<simple>${date:now:yyyyMMddhhmmssSSS}-converted.xml</simple>
+			</setHeader>
+			<to uri="file:done" />
+		</route>
+	</camelContext>
 
 </blueprint>
+
