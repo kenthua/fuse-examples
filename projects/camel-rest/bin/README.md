@@ -25,12 +25,6 @@ URL: `http://<IP/HOSTNAME>:9091/app/newStockEntryJSON`
 {"stocktrade":{"name":"Test User","custId":"12345","vip":1,"stockId":"XYZ","shares":11}}
 ```
 
-* Input JSON it will convert to XML, send XML to one queue then be passed onto another queue
-URL: `http://<IP/HOSTNAME>:9091/app/newStockEntryJSONAMQ`  
-```
-{"stocktrade":{"name":"Test User","custId":"12345","vip":1,"stockId":"XYZ","shares":11}}
-```
-
 
 
 **NOTE:** the use of streamCache="true" in this example.  [StreamCache](http://camel.apache.org/stream-caching.html)

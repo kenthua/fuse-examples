@@ -5,13 +5,7 @@
        http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
        http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
 
-	<bean id="activemq" class="org.apache.activemq.camel.component.ActiveMQComponent">
-		<property name="brokerURL" value="tcp://localhost:61616" />
-		<property name="userName" value="admin" />
-		<property name="password" value="admin" />
-	</bean>
-
-	<camelContext id="camel-rest"
+	<camelContext id="context-4f81fa65-c073-4839-8021-d9f5d151e3e2"
 		xmlns="http://camel.apache.org/schema/blueprint">
 		<endpoint
 			uri="dozer:stockTradeJSONToXML?sourceModel=source.Source&amp;targetModel=generated.Stocktrading&amp;marshalId=generated&amp;unmarshalId=sourceSource&amp;mappingFile=stockTradeJSONToXML.xml"
@@ -25,6 +19,14 @@
 			<json library="Jackson" id="transform-json" />
 		</dataFormats>
 		<restConfiguration component="jetty" port="9091" />
+		<rest path="/say">
+			<get uri="/hello">
+				<to uri="direct:hello" />
+			</get>
+			<get uri="/bye">
+				<to uri="direct:bye" />
+			</get>
+		</rest>
 		<rest path="/app">
 			<get uri="/byId/{id}">
 				<to uri="direct:byId" />
@@ -35,18 +37,30 @@
 			<post uri="/newStockEntryJSON" consumes="application/json">
 				<to uri="direct:newStockEntryJSON" />
 			</post>
-			<post uri="/newStockEntryJSONAMQ" consumes="application/json">
-				<to uri="direct:newStockEntryJSONAMQ" />
-			</post>
 		</rest>
-
+		<route>
+			<from uri="direct:hello" />
+			<transform>
+				<constant>Hello World</constant>
+			</transform>
+		</route>
+		<route>
+			<from uri="direct:bye" />
+			<transform>
+				<constant>Bye World</constant>
+			</transform>
+		</route>
+		<route>
+			<from uri="direct:byId" />
+			<log message="${body}" />
+		</route>
 		<!-- REST DSL when using restConfiguration binding attribute, will convert 
 			input into POJO -->
 		<!-- REST DSL, when not using restConfiguration binding attribute (default 
 			is "off") need to set streamCache to true, otherwise the message body is 
 			removed after the pre transform: ${body} log -->
-		<!-- however, using from file input, the streamcache doesn't need to be 
-			set to true -->
+		<!-- however, using from file input, the streamcache doesn't need to be set 
+			to true -->
 		<route streamCache="true">
 			<from uri="direct:newStockEntryXML" />
 			<log message="pre transform XML: ${body}" />
@@ -66,19 +80,6 @@
 				<simple>${date:now:yyyyMMddhhmmssSSS}-converted.xml</simple>
 			</setHeader>
 			<to uri="file:done" />
-		</route>
-		<route streamCache="true">
-			<from uri="direct:newStockEntryJSONAMQ" />
-			<log message="pre transform JSON: ${body}" />
-			<to ref="stockTradeJSONToXML" />
-			<log message="post transform XML: ${body}" />
-			<to uri="activemq:queue:TestFirstQueue" pattern="InOnly" />
-		</route>
-		
-		<route>
-			<from uri="activemq:queue:TestFirstQueue" />
-			<log message="activemq XML: ${body}" />
-			<to uri="activemq:queue:TestEndQueue" />
 		</route>
 	</camelContext>
 
