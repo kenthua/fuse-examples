@@ -1,0 +1,17 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hel="http://www.jboss.org/jbossas/quickstarts/wshelloworld/HelloWorld">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <hel:testObjectReturn>
+         <!--Optional:-->
+         <arg0>
+            <!--Optional:-->
+            <id>1</id>
+            <!--Optional:-->
+            <message>?</message>
+            <!--Optional:-->
+            <name>?</name>
+         </arg0>
+      </hel:testObjectReturn>
+   </soapenv:Body>
+</soapenv:Envelope>
+
